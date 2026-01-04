@@ -20,3 +20,6 @@ class AcademicRecord(BaseModel):
             raise ValueError("CA + Exam score cannot exceed 100")
         return exam
 
+class DepartmentMetadata(BaseModel):
+     name: str
+     allows_500_level: bool
