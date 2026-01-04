@@ -33,13 +33,13 @@ class BinaryClassifierPredictor:
     def _risk_level(self, proba: float) -> str:
         t = self.threshold
 
-        if proba >= t * 1.5:
+        if proba >= min(t * 1.5, 0.95):
             return "Very High"
-        if proba >= t * 1.2:
+        if proba >= min(t * 1.2, 0.85):
             return "High"
         if proba >= t:
             return "Moderate"
-        if proba >= t * 0.7:
+        if proba >= t * 0.8:
             return "Low"
         return "Very Low"
         
