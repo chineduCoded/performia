@@ -138,4 +138,4 @@ def generate_synthetic_data(
     print(df.head())
 
 
-generate_synthetic_data(num_students=1000, semester_per_student=2)
+generate_synthetic_data(num_students=3000, semester_per_student=2)
