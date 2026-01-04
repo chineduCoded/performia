@@ -32,6 +32,12 @@ class ModelLoader:
 
 
                 if isinstance(artifact, dict):
+                    required_keys = {"model", "features", "model_version"}
+                    missing_keys = required_keys - artifact.keys()
+                    
+                    if missing_keys:
+                        raise ValueError(f"Artifact missing required keys: {missing_keys}")
+                    
                     model_artifact = ModelArtifact(
                         model=artifact["model"],
                         threshold=artifact.get("threshold", 0.35),
