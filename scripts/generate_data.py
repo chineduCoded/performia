@@ -1,5 +1,6 @@
 import uuid
 import random
+from typing import Union
 import numpy as np
 import pandas as pd
 from app.utils.enums import PerformanceTrend
@@ -9,7 +10,8 @@ def generate_synthetic_data(
     num_students: int = 1000,
     semester_per_student: int = 2,
     output_file: str = "nigerian_university_students.csv",
-):
+    seed: Union[int, None] = 42,
+) -> None:
     """
     Generate realistic synthetic Nigerian university student performance data
     with temporal aspect (multiple semesters per student).
@@ -20,10 +22,14 @@ def generate_synthetic_data(
     num_students: int = Number of unique students
     semester_per_student:int = Number of semesters per student
     output_file: str = CSV file to save the generated data
+    seed: Union[int, None] = Random seed for reproducibility
+
+    Returns: None
     """
 
-    random.seed(42)
-    np.random.seed(42)
+    if seed is not None:
+        np.random.seed(seed)
+        random.seed(seed)
 
     departments = [
         "Computer Science",
