@@ -143,5 +143,5 @@ def generate_synthetic_data(
     print(f"Generated {len(df)} records for {num_students} students.")
     print(df.head())
 
-
-generate_synthetic_data(num_students=3000, semester_per_student=2)
+if __name__ == "__main__":
+    generate_synthetic_data(num_students=3000, semester_per_student=2)
