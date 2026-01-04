@@ -13,6 +13,7 @@ def predict(record: AcademicRecord):
             record.department, 
             record.level
         )
+        result = predict_risk(record.model_dump())
     except ValueError as ve:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -24,4 +25,4 @@ def predict(record: AcademicRecord):
             detail=str(e)
         )
     
-    return predict_risk(record.model_dump())
+    return result
