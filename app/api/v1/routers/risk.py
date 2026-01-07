@@ -11,7 +11,6 @@ router = APIRouter()
 def predict_risk(record: AcademicRecord, artifact=Depends(get_risk_artifact)):
     
     try:
-        record = AcademicRecord.model_validate(record)
         DepartmentValidator.validate(
             record.department, 
             record.level
@@ -20,7 +19,8 @@ def predict_risk(record: AcademicRecord, artifact=Depends(get_risk_artifact)):
         payload = record.model_dump()
 
         X = artifact.to_matrix(payload)
-        prob = float(artifact.predictor.predict_proba(X)[0])
+
+        prob = float(artifact.predictor.predict_proba(X)[0][1])
         risk = int(artifact.predictor.predict(X)[0])
         
         return {
@@ -29,12 +29,13 @@ def predict_risk(record: AcademicRecord, artifact=Depends(get_risk_artifact)):
             "model_version": artifact.version,
         }
     except ValueError as ve:
+        # logger.warning(f"Validation error in risk prediction: {ve}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(ve)
+            detail="Invalid input data. Please check your request."
         )
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Prediction failed"
         )

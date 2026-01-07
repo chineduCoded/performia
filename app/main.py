@@ -4,6 +4,7 @@ import logging
 from fastapi import FastAPI
 from typing import AsyncGenerator
 
+from app.config import initialize_directories
 from app.api.v1.routers import risk, metadata
 from app.core.dependencies import load_models
 
@@ -12,8 +13,11 @@ logger = logging.getLogger("uvicorn")
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
-        load_models()
+        await load_models()
         logger.info("Models loaded successfully")
+
+        initialize_directories()
+        logger.info("Required directories initialized")
     except Exception as e:
         logger.error("Failed to load model(s): %s", e)
         raise

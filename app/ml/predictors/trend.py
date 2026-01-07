@@ -7,8 +7,9 @@ class TrendPredictor(SequencePredictor):
         self.policy = trend_policy
 
     def train(self, X_seq, y_seq=None):
-        if hasattr(self.model, "fit"):
-            self.model.fit(X_seq, y_seq)
+        if not hasattr(self.model, "fit"):
+            raise AttributeError(f"Model {type(self.model).__name__} does not have a 'fit' method")
+        self.model.fit(X_seq, y_seq)
 
     def predict_sequence(self, X_seq):
         raw_trend = self.model.predict(X_seq)

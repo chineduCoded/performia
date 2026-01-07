@@ -61,10 +61,10 @@ def generate_synthetic_data(
         department = random.choice(departments)
 
         if department in five_hundred_level_departments:
-            start_level = random.choice([100, 200, 300, 400, 500])
+            start_level = random.choice([100, 200, 300, 400])
             max_level = 500
         else:
-            start_level = random.choice([100, 200, 300, 400])
+            start_level = random.choice([100, 200, 300])
             max_level = 400
 
         prev_final_score = None

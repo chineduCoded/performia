@@ -61,13 +61,13 @@ class ThresholdCVTrainer:
             for k in metrics[0]
         }
     
-    def train(self, X, y):
+    def train(self, X, y, student_ids=None):
         """
         Train final model on full data using threshold optimized CV
         """
         thresholds = []
 
-        for train_idx, val_idx in self.splitter.split(X, y, student_ids=None):
+        for train_idx, val_idx in self.splitter.split(X, y, student_ids):
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
 

@@ -15,10 +15,9 @@ router = APIRouter()
 def list_departments() -> List[DepartmentMetadata]:
     """Returns a list of all departments with their configuration metadata."""
     return [
-
-    DepartmentMetadata(
-        name=name,
-        allows_500_level=cfg.get("allows_500_level", False)
-    )
+        DepartmentMetadata(
+            name=name,
+            allows_500_level=cfg.get("allows_500_level", False)
+        )
         for name, cfg in DEPARTMENTS.items()
     ]

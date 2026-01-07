@@ -19,8 +19,9 @@ class CrossValidatedTrainer:
             self.pipeline.fit(X_train, y_train)
             y_prob = self.pipeline.predict_proba(X_val)[:, 1]
 
-            aucs.append(roc_auc_score(y_val, y_prob))
-            aps.append(average_precision_score(y_val, y_prob))
+            if len(np.unique(y_val)) > 1:
+                aucs.append(roc_auc_score(y_val, y_prob))
+                aps.append(average_precision_score(y_val, y_prob))
 
         return {
             "ROC_AUC": np.mean(aucs),

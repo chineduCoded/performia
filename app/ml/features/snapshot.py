@@ -12,6 +12,11 @@ class SnapshotFeatureEngineer:
     CATEGORICAL = ["department"]
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        required_cols = ["study_hours_per_week", "attendance_pct"]
+        missing_cols = [col for col in required_cols if col not in df.columns]
+        if missing_cols:
+            raise ValueError(f"Missing required columns: {missing_cols}")
+        
         df = df.copy()
 
         df["study_effort_ratio"] = (
