@@ -14,17 +14,16 @@ def generate_synthetic_data(
 ) -> None:
     """
     Generate realistic synthetic Nigerian university student performance data
-    with temporal aspect (multiple semesters per student).
-    - Risk prediction
-    - Score prediction
-    - Improvement detection
+    with temporal progression.
 
-    num_students: int = Number of unique students
-    semester_per_student:int = Number of semesters per student
-    output_file: str = CSV file to save the generated data
-    seed: Union[int, None] = Random seed for reproducibility
+    - Academic risk prediction
+    - Performance trend detection
+    - Level progression (every 2 semesters)
 
-    Returns: None
+    num_students: Number of unique students
+    semester_per_student: Number of semesters per student
+    output_file: CSV file to save the generated data
+    seed: Random seed for reproducibility
     """
 
     if seed is not None:
@@ -49,7 +48,6 @@ def generate_synthetic_data(
         "Biochemistry",
     ]
 
-    # Departments that legitimately have 500 level
     five_hundred_level_departments = {
         "Medicine",
         "Law",
@@ -63,20 +61,27 @@ def generate_synthetic_data(
         department = random.choice(departments)
 
         if department in five_hundred_level_departments:
-            level = random.choice([100, 200, 300, 400, 500])
+            start_level = random.choice([100, 200, 300, 400, 500])
+            max_level = 500
         else:
-            level = random.choice([100, 200, 300, 400])
+            start_level = random.choice([100, 200, 300, 400])
+            max_level = 400
 
         prev_final_score = None
 
         for semester in range(1, semester_per_student + 1):
+
+            level_increment = (semester - 1) // 2
+            current_level = min(start_level + level_increment * 100, max_level)
+
             attendance = np.clip(np.random.normal(75, 15), 20, 100)
             study_hours = np.clip(np.random.normal(12, 5), 0, 35)
             prev_gpa = np.clip(np.random.normal(3.0, 0.8), 0, 5)
 
             ca_score = np.clip(
                 np.random.normal(15 + (attendance / 100) * 20, 5),
-                0, 40,
+                0,
+                40,
             )
 
             exam_score = np.clip(
@@ -84,7 +89,8 @@ def generate_synthetic_data(
                     25 + (study_hours / 35) * 25 + (prev_gpa / 5) * 10,
                     10,
                 ),
-                0, 60,
+                0,
+                60,
             )
 
             noise = np.random.normal(0, 3)
@@ -120,7 +126,7 @@ def generate_synthetic_data(
                     "student_id": student_id,
                     "semester": semester,
                     "department": department,
-                    "level": level,
+                    "level": current_level,
                     "attendance_pct": round(attendance, 1),
                     "study_hours_per_week": round(study_hours, 1),
                     "prev_gpa": round(prev_gpa, 2),

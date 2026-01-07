@@ -4,18 +4,18 @@ import logging
 from fastapi import FastAPI
 from typing import AsyncGenerator
 
-from app.api.v1.routes import risk, metadata
-from app.services.model_loader import ModelLoader
+from app.api.v1.routers import risk, metadata
+from app.core.dependencies import load_models
 
 logger = logging.getLogger("uvicorn")
 
 @asynccontextmanager
-async def load_models(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
-        ModelLoader.load_model("risk", "risk_model.joblib")
-        logger.info("Risk model loaded successfully")
+        load_models()
+        logger.info("Models loaded successfully")
     except Exception as e:
-        logger.error("Failed to load risk model: %s", e)
+        logger.error("Failed to load model(s): %s", e)
         raise
     yield
 
@@ -23,7 +23,7 @@ app = FastAPI(
     title="Performia API",
     version="0.1.0",
     description="API for predicting academic risk based on student records.",
-    lifespan=load_models,
+    lifespan=lifespan,
 )
 
 app.include_router(risk.router, prefix="/api/v1")

@@ -12,6 +12,13 @@ The system uses synthetically generated Nigerian university academic data modele
 - Target: `is_at_risk`
      - `1 = at risk / failed`
      - `0 = not at risk / passed`
+- Success metrics
+     - Accuracy (often misleading)
+     - Precision / Recall
+     - F1-score
+     - ROC-AUC
+     - Precision-Recall (PR) curve
+     - Recall@Risk (important in education)
 
 ### Score Prediction
 > “Can we predict a student’s final score?”
