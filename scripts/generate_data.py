@@ -4,6 +4,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 from app.utils.enums import PerformanceTrend
+from app.config import DATA_DIR
 
 
 def generate_synthetic_data(
@@ -143,8 +144,12 @@ def generate_synthetic_data(
 
             prev_final_score = final_score
 
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    data_path = DATA_DIR / output_file
+
     df = pd.DataFrame(records)
-    df.to_csv(output_file, index=False)
+    df.to_csv(data_path, index=False)
 
     print(f"Generated {len(df)} records for {num_students} students.")
     print(df.head())

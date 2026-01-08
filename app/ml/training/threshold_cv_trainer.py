@@ -1,3 +1,5 @@
+import inspect
+
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import (
     accuracy_score,
@@ -26,14 +28,18 @@ class ThresholdCVTrainer:
         self.threshold_optimizer = threshold_optimizer
 
     def evaluate(self, X, y, student_ids):
+        if student_ids is None:
+            raise ValueError("studen_ids must be provided for group-based CV")
+        
         fold_metrics = []
 
         for train_idx, val_idx in self.splitter.split(X, y, student_ids):
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+            groups_train = student_ids.iloc[train_idx]
 
-            # Train
-            self.pipeline.fit(X_train, y_train)
+            # Train (GROUP-SAFE)
+            self._fit_pipeline(X_train, y_train, groups=groups_train)
 
             # Predict probabilities
             y_prob = self.pipeline.predict_proba(X_val)[:, 1]
@@ -57,19 +63,25 @@ class ThresholdCVTrainer:
 
     def _aggregate(self, metrics):
         return {
-            k: np.mean([m[k] for m in metrics])
+            k: float(np.mean([m[k] for m in metrics]))
             for k in metrics[0]
         }
     
-    def train(self, X, y, student_ids=None):
+    def train(self, X, y, student_ids):
         """
         Train final model on full data using threshold optimized CV
         """
+        if student_ids is None:
+            raise ValueError("student_ids must be provided for group-based CV")
+        
         thresholds = []
 
         for train_idx, val_idx in self.splitter.split(X, y, student_ids):
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+            groups_train = student_ids.iloc[train_idx]
+
+            self._fit_pipeline(X_train, y_train, groups=groups_train)
 
             self.pipeline.fit(X_train, y_train)
             y_prob = self.pipeline.predict_proba(X_val)[:, 1]
@@ -80,9 +92,25 @@ class ThresholdCVTrainer:
         final_threshold = float(np.mean(thresholds))
 
         # Train on full dataset
-        self.pipeline.fit(X, y)
+        self._fit_pipeline(X, y, groups=student_ids)
 
         return RiskPredictor(
             pipeline=self.pipeline,
             threshold_policy=ThresholdPolicy(final_threshold)
         )
+    
+    def _fit_pipeline(self, X, y, groups=None):
+        """
+        safe fit:
+        - Passes groups ONLY if the underlying estimator supports it
+        """
+        fit_params = {}
+
+        if groups is not None:
+            model = self.pipeline.named_steps["model"]
+            fit_sig = inspect.signature(model.fit)
+
+            if "groups" in fit_sig.parameters:
+                fit_params["model__groups"] = groups
+
+        self.pipeline.fit(X, y, **fit_params)

@@ -5,6 +5,11 @@ from abc import ABC, abstractmethod
 # -------------------------
 class BasePredictor(ABC):
     @abstractmethod
+    def predict(self, X):
+        pass
+
+class RegressionPredictor(ABC):
+    @abstractmethod
     def train(self, X, y):
         pass
 

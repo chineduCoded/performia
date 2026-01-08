@@ -15,7 +15,7 @@ from app.ml.predictors.risk import RiskPredictor
 from app.ml.policies.threshold import ThresholdPolicy
 from app.services.model_artifact import ModelArtifact
 from app.ml.training.threshold_cv_trainer import ThresholdCVTrainer, ThresholdOptimizer
-from app.config import ARTIFACTS_DIR
+from app.config import ARTIFACTS_DIR, DATA_DIR
 
 def train_and_save_risk_models(csv_path: Path, version=None):
     if not csv_path.exists():
@@ -50,7 +50,7 @@ def train_and_save_risk_models(csv_path: Path, version=None):
     models = {
         "rf": RandomForestRiskModel(engineer.NUMERIC, engineer.CATEGORICAL),
         "xgb": XGBoostRiskModel(engineer.NUMERIC, engineer.CATEGORICAL),
-        "lgbm": LightGBMRiskModel(engineer.NUMERIC, engineer.CATEGORICAL),
+        # "lgbm": LightGBMRiskModel(engineer.NUMERIC, engineer.CATEGORICAL),
     }
 
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -67,12 +67,13 @@ def train_and_save_risk_models(csv_path: Path, version=None):
             )
 
             metrics = trainer.evaluate(X, y, student_ids)
-            predictor = trainer.train(X, y)
+            predictor = trainer.train(X, y, student_ids)
 
             artifact = ModelArtifact(
                 predictor=predictor,
                 features=engineer.feature_columns,
-                version=version
+                version=version,
+                metrics=metrics
             )
 
             artifact_path = ARTIFACTS_DIR / f"risk_{name}.joblib"
@@ -83,3 +84,8 @@ def train_and_save_risk_models(csv_path: Path, version=None):
         except Exception as e:
             print(f"[{name}] FAILED: {e}")
             continue
+
+if __name__ == "__main__":
+    train_and_save_risk_models(
+        csv_path=Path(DATA_DIR / "nigerian_university_students.csv")
+    )

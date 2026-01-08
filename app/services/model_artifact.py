@@ -9,6 +9,7 @@ class ModelArtifact:
     predictor: BasePredictor
     features: List[str]
     version: str
+    metrics: dict
 
     def validate_input(self, payload: dict):
         missing = set(self.features) - payload.keys()

@@ -1,8 +1,8 @@
 from sklearn.pipeline import Pipeline
 
-from .base import BasePredictor
+from .base import RegressionPredictor
 
-class ScorePredictor(BasePredictor):
+class ScorePredictor(RegressionPredictor):
     def __init__(self, pipeline: Pipeline):
         self.pipeline = pipeline
 
