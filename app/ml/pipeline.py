@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 import joblib
 
@@ -54,6 +55,9 @@ def train_and_save_risk_models(csv_path: Path, version=None):
 
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
 
+    if version is None:
+        version = datetime.now().strftime("%Y-%m-%d")
+
     for name, model in models.items():
         try:
             trainer = ThresholdCVTrainer(
@@ -64,10 +68,6 @@ def train_and_save_risk_models(csv_path: Path, version=None):
 
             metrics = trainer.evaluate(X, y, student_ids)
             predictor = trainer.train(X, y)
-
-            if version is None:
-                from datetime import datetime
-                version = datetime.now().strftime("%Y-%m-%d")
 
             artifact = ModelArtifact(
                 predictor=predictor,

@@ -29,7 +29,6 @@ def predict_risk(record: AcademicRecord, artifact=Depends(get_risk_artifact)):
             "model_version": artifact.version,
         }
     except ValueError as ve:
-        # logger.warning(f"Validation error in risk prediction: {ve}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid input data. Please check your request."

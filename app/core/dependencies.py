@@ -10,7 +10,7 @@ loader = ModelLoader(
 )
 
 async def load_models():
-    loader.load("risk", "risk_model.joblib")
+    await loader.load("risk", "risk_model.joblib")
     # loader.load("score", "score_model.joblib")
     # loader.load("trend", "trend_model.joblib")
 

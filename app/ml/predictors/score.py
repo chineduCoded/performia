@@ -7,7 +7,7 @@ class ScorePredictor(BasePredictor):
         self.pipeline = pipeline
 
     def train(self, X, y):
-        self.pipelne.fit(X, y)
+        self.pipeline.fit(X, y)
 
     def predict(self, X):
         return self.pipeline.predict(X)

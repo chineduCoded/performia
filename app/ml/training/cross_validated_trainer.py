@@ -11,6 +11,7 @@ class CrossValidatedTrainer:
 
     def evaluate(self, X, y, student_ids):
         aucs, aps = [], []
+        skipped_folds = 0
 
         for train_idx, val_idx in self.splitter.split(X, y, student_ids):
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
@@ -22,8 +23,20 @@ class CrossValidatedTrainer:
             if len(np.unique(y_val)) > 1:
                 aucs.append(roc_auc_score(y_val, y_prob))
                 aps.append(average_precision_score(y_val, y_prob))
+            else:
+                skipped_folds += 1
+                # logger.warning(f"Skipping fold with single class in validation set. Class: {np.unique(y_val)[0]}
+
+        if len(aucs) == 0:
+            raise ValueError("All folds had single-class validation sets. Cannot compute ROC_AUC or AP metrics. Consider using stratified splitting.")
+        
+        if skipped_folds > 0:
+            print(f"Skipped {skipped_folds} fold(s) due to single-class validation sets. Results may be biased.")
+            # logger.warning(f"Skipped {skipped_folds} fold(s) due to single-class validation sets. Results may be biased.")
 
         return {
             "ROC_AUC": np.mean(aucs),
             "AP": np.mean(aps),
+            "valid_folds": len(aucs),
+            "skipped_folds": skipped_folds,
         }

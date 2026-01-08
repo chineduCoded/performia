@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         initialize_directories()
         logger.info("Required directories initialized")
     except Exception as e:
-        logger.error("Failed to load model(s): %s", e)
+        logger.error("Failed during initialization: %s", e)
         raise
     yield
 

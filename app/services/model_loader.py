@@ -18,12 +18,12 @@ class ModelLoader:
 
     def __init__(self, artifacts_dir: Path):
         self.artifacts_dir = artifacts_dir
-        self._cache: dict[str, ModelArtifact] = {}
+        self._cache: dict[tuple[str, str], ModelArtifact] = {}
         self._lock = threading.Lock()
 
     def load(self, name: str, filename: str) -> ModelArtifact:
         with self._lock:
-            cache_key = f"{name}:{filename}"
+            cache_key = (name, filename)
             if cache_key in self._cache:
                 return self._cache[cache_key]
             

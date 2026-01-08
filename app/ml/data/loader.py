@@ -9,15 +9,18 @@ class StudentDataLoader:
     def load_latest_semester(self) -> pd.DataFrame:
         try:
             df = pd.read_csv(self.path)
-            if not pd.api.types.is_numeric_dtype(df["semester"]) and not pd.api.types.is_datetime64_any_dtype(df["semester"]):
-                raise ValueError("semester column must be numeric or datetime for chronological sorting")
-
         except FileNotFoundError:
             raise FileNotFoundError(f"Data file not found: {self.path}")
         except pd.errors.EmptyDataError:
             raise ValueError(f"Data file is empty: {self.path}")
         except Exception as e:
             raise ValueError(f"Failed to read CSV file {self.path}: {str(e)}")
+        
+        # Validate semester column after successful read
+        if "semester" not in df.columns:
+            raise ValueError(f"Required column 'semester' not found in {self.path}")
+        if not pd.api.types.is_numeric_dtype(df["semester"]) and not pd.api.types.is_datetime64_any_dtype(df["semester"]):
+            raise ValueError("semester column must be numeric or datetime for chronological sorting")
 
         df_latest = (
             df.sort_values(["student_id", "semester"])
