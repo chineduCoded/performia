@@ -11,17 +11,31 @@ class LightGBMRiskModel(BaseModelSpec):
         self.cat_features = cat_features
 
     def build_pipeline(self):
-        preprocessor = ColumnTransformer([
-            ("num", StandardScaler(), self.num_features),
-            ("cat", OneHotEncoder(handle_unknown="ignore"), self.cat_features),
-        ])
+        preprocessor = (
+            ColumnTransformer(
+                [
+                    ("num", "passthrough", self.num_features),
+                    ("cat", 
+                     OneHotEncoder(
+                        handle_unknown="ignore", 
+                        sparse_output=False
+                        ), 
+                        self.cat_features
+                    ),
+                ],
+                verbose_feature_names_out=False,
+            )
+            .set_output(transform="pandas")
+        )
 
         lgbm = LGBMClassifier(
             n_estimators=500,
             max_depth=6,
             learning_rate=0.05,
             class_weight={0: 1, 1: 3},
-            random_state=42
+            random_state=42,
+            force_col_wise=True,
+            verbose=-1
         )
 
         return Pipeline([

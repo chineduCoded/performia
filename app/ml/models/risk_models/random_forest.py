@@ -1,6 +1,6 @@
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.calibration import CalibratedClassifierCV
 
@@ -12,10 +12,16 @@ class RandomForestRiskModel(BaseModelSpec):
         self.cat_features = cat_features
 
     def build_pipeline(self) -> Pipeline:
-        preprocessor = ColumnTransformer([
-            ("num", "passthrough", self.num_features),
-            ("cat", OneHotEncoder(handle_unknown="ignore"), self.cat_features)
-        ])
+        preprocessor = (
+            ColumnTransformer(
+                [
+                    ("num", "passthrough", self.num_features),
+                    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), self.cat_features)
+                ],
+                verbose_feature_names_out=False,
+            )
+            .set_output(transform="pandas")
+        )
 
         rf = RandomForestClassifier(
             n_estimators=300,

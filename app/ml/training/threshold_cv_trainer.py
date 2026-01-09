@@ -7,6 +7,7 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
     average_precision_score,
+    fbeta_score
 )
 import numpy as np
 
@@ -50,6 +51,13 @@ class ThresholdCVTrainer:
 
             y_pred = (y_prob >= threshold).astype(int)
 
+            fbeta = fbeta_score(
+                y_val,
+                y_pred,
+                beta=2,
+                zero_division=0
+            )
+
             fold_metrics.append({
                 "threshold": threshold,
                 "roc_auc": roc_auc_score(y_val, y_prob),
@@ -57,6 +65,7 @@ class ThresholdCVTrainer:
                 "precision": precision_score(y_val, y_pred, zero_division=0),
                 "recall": recall_score(y_val, y_pred),
                 "accuracy": accuracy_score(y_val, y_pred),
+                "f2": fbeta,
             })
 
         return self._aggregate(fold_metrics)
