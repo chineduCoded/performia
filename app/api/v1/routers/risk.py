@@ -75,6 +75,14 @@ def predict_risk(
             detail="Invalid input features provided"
         )
     except Exception as e:
+        logger.error(
+            "Prediction failed",
+            exc_info=True,
+            extra={
+                "department": record.department,
+                "level": record.level
+            }
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Prediction failed"
