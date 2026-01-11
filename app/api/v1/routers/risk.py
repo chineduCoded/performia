@@ -69,9 +69,10 @@ def predict_risk(
         return RiskPredictionResponse(**result)
     
     except ValueError as ve:
+        logger.error(f"Feature validation failed: {ve}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid features: {ve}"
+            detail="Invalid input features provided"
         )
     except Exception as e:
         raise HTTPException(
