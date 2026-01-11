@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from app.schemas.academic_record import AcademicRecord
 from app.core.departments import DepartmentValidator
 from app.core.dependencies import get_risk_artifact
-from app.utils.enums import RiskLevel
+from app.utils.enums import RiskClassification
 from app.schemas.prediction import RiskPredictionResponse
 from app.ml.inference.risk_interpreter import interpret_risk
 
@@ -40,15 +40,16 @@ def predict_risk(
         else:
             prob = float(proba[0, 1])
 
-        risk_int = int(artifact.predictor.predict(X)[0])
-        risk_enum = RiskLevel.AT_RISK if risk_int else RiskLevel.NOT_AT_RISK
+        risk = int(artifact.predictor.predict(X)[0])
+        risk_class = RiskClassification.AT_RISK if prob >= 0.5 else RiskClassification.NOT_AT_RISK
         
         interpretation = interpret_risk(prob)
 
         result =  {
             "probability": round(prob, 4),
             "probability_pct": round(prob * 100, 2),
-            "risk": risk_enum,
+            "predicted_risk": risk,
+            "risk_class": risk_class,
             "risk_label": interpretation["risk_label"],
             "advice": interpretation["advice"],
             "severity": interpretation["severity"],
@@ -61,7 +62,7 @@ def predict_risk(
                 "department": record.department,
                 "level": record.level,
                 "probability": prob,
-                "risk": risk_enum.value
+                "risk": risk_class.value
             }
         )
 

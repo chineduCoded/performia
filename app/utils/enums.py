@@ -15,7 +15,7 @@ class Level(int, enum.Enum):
     L400 = 400
     L500 = 500
 
-class RiskLevel(str, enum.Enum):
+class RiskClassification(str, enum.Enum):
     NOT_AT_RISK = "Not at risk"
     AT_RISK = "At risk"
 

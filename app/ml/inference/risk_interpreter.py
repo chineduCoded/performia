@@ -1,5 +1,5 @@
 from app.config import RISK_THRESHOLDS
-from app.utils.enums import RiskLevel, RiskSeverityLevel, Severity
+from app.utils.enums import RiskSeverityLevel
 from app.schemas.prediction import SeverityInfo
 from app.utils.severity_map import SEVERITY_MAP
 

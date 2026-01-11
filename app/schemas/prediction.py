@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from app.utils.enums import RiskLevel, RiskSeverityLevel
+from app.utils.enums import RiskClassification, RiskSeverityLevel
 
 class SeverityInfo(BaseModel):
     level: RiskSeverityLevel
@@ -9,8 +9,9 @@ class SeverityInfo(BaseModel):
 
 class RiskPredictionResponse(BaseModel):
     probability: float = Field(..., ge=0.0, le=1.0)
-    probability_pct: float = Field(..., ge=0, le=100)          
-    risk: RiskLevel
+    probability_pct: float = Field(..., ge=0, le=100)
+    predicted_risk: int        
+    risk_class: RiskClassification
     risk_label: str
     advice: str
     severity: SeverityInfo
