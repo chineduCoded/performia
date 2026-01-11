@@ -1,15 +1,28 @@
+import logging
+
 from fastapi import APIRouter, HTTPException, status, Depends
 
 from app.schemas.academic_record import AcademicRecord
 from app.core.departments import DepartmentValidator
 from app.core.dependencies import get_risk_artifact
-from app.services.model_artifact import ModelArtifact
+from app.utils.enums import RiskLevel
+from app.schemas.prediction import RiskPredictionResponse
+from app.ml.inference.risk_interpreter import interpret_risk
 
-router = APIRouter()
+logger = logging.getLogger(__name__)
 
-@router.post("/predict/risk")
-def predict_risk(record: AcademicRecord, artifact=Depends(get_risk_artifact)):
-    
+router = APIRouter(tags=["predictions"], prefix="/predict")
+
+@router.post(
+    "/risk",
+    summary="Predict student academic risk",
+    description="Predicts early student risk based on academic record.",
+    response_model=RiskPredictionResponse
+)
+def predict_risk(
+    record: AcademicRecord,
+    artifact=Depends(get_risk_artifact)
+) -> RiskPredictionResponse:  
     try:
         DepartmentValidator.validate(
             record.department, 
@@ -18,23 +31,49 @@ def predict_risk(record: AcademicRecord, artifact=Depends(get_risk_artifact)):
 
         payload = record.model_dump()
 
-        X = artifact.to_matrix(payload)
+        X = artifact.prepare_features(payload)
 
-        prob = float(artifact.predictor.predict_proba(X)[0][1])
-        risk = int(artifact.predictor.predict(X)[0])
+        proba = artifact.predictor.predict_proba(X)
+
+        if proba.ndim == 1:
+            prob = float(proba[0])
+        else:
+            prob = float(proba[0, 1])
+
+        risk_int = int(artifact.predictor.predict(X)[0])
+        risk_enum = RiskLevel.AT_RISK if risk_int else RiskLevel.NOT_AT_RISK
         
-        return {
+        interpretation = interpret_risk(prob)
+
+        result =  {
             "probability": round(prob, 4),
-            "risk": risk,
+            "probability_pct": round(prob * 100, 2),
+            "risk": risk_enum,
+            "risk_label": interpretation["risk_label"],
+            "advice": interpretation["advice"],
+            "severity": interpretation["severity"],
             "model_version": artifact.version,
         }
+
+        logger.info(
+            "Risk prediction",
+            extra={
+                "department": record.department,
+                "level": record.level,
+                "probability": prob,
+                "risk": risk_enum.value
+            }
+        )
+
+        return RiskPredictionResponse(**result)
+    
     except ValueError as ve:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid input data. Please check your request."
+            detail=f"Invalid features: {ve}"
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Prediction failed"
+            detail=f"Prediction failed"
         )

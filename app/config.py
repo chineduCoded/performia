@@ -1,4 +1,5 @@
 from pathlib import Path
+from dataclasses import dataclass
 
 # app/
 BASE_DIR = Path(__file__).resolve().parent
@@ -17,3 +18,13 @@ def initialize_directories():
     """Create required directories for the application."""
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@dataclass(frozen=True)
+class RiskThresholds:
+    low: float = 0.15
+    borderline: float = 0.25
+    moderate: float = 0.50
+
+
+RISK_THRESHOLDS = RiskThresholds()

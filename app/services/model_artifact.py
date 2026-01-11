@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+import pandas as pd
+
 from app.ml.predictors.base import BasePredictor
 
 
@@ -16,6 +18,9 @@ class ModelArtifact:
         if missing:
             raise ValueError(f"Missing features: {missing}")
     
-    def to_matrix(self, payload: dict):
+    def prepare_features(self, payload: dict) -> pd.DataFrame:
+        """
+        Convert payload dict to DataFrame with correct feature columns.
+        """
         self.validate_input(payload)
-        return [[payload[f] for f in self.features]]
+        return pd.DataFrame([{f: payload[f] for f in self.features}])

@@ -11,9 +11,9 @@ async def load_models():
     """
     Preload production models at app startup.
     """
-    await loader.load("risk", "risk_production.joblib")
-    # await loader.load("score", "score_model.joblib")
-    # await loader.load("trend", "trend_model.joblib")
+    loader.load("risk", "risk_production.joblib")
+    # loader.load("score", "score_model.joblib")
+    # loader.load("trend", "trend_model.joblib")
 
 
 @lru_cache(maxsize=32)
@@ -37,5 +37,4 @@ def get_risk_artifact(model: str = "risk") -> object:
     if artifact_file is None:
         raise ValueError(f"No artifact found for model '{model}'")
 
-    # Load artifact synchronously
     return loader.load(model, artifact_file)
