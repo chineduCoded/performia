@@ -7,9 +7,9 @@ from sklearn.calibration import CalibratedClassifierCV
 from ..base import BaseModelSpec
 
 class RandomForestRiskModel(BaseModelSpec):
-    def __init__(self, num_features, cat_features):
-        self.num_features = num_features
-        self.cat_features = cat_features
+    # def __init__(self, num_features, cat_features):
+    #     self.num_features = num_features
+    #     self.cat_features = cat_features
 
     def build_pipeline(self) -> Pipeline:
         preprocessor = (

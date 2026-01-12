@@ -5,8 +5,8 @@ The system uses synthetically generated Nigerian university academic data modele
 
 ## Problems
 
-### Risk Prediction
-> “Predict whether a student is at academic risk.”
+### Current Risk Prediction
+> “Is this student currently at academic risk?”
 
 - Type: Binary classification
 - Target: `is_at_risk`
@@ -19,12 +19,6 @@ The system uses synthetically generated Nigerian university academic data modele
      - ROC-AUC
      - Precision-Recall (PR) curve
      - Recall@Risk (important in education)
-
-### Score Prediction
-> “Can we predict a student’s final score?”
-
-- Type: Regression
-- Target: `final_score`
 
 ### Improvement Detection
 > “Is this student improving, declining, or stable?”

@@ -11,8 +11,7 @@ async def load_models():
     """
     Preload production models at app startup.
     """
-    loader.load("risk", "risk_production.joblib")
-    # loader.load("score", "score_model.joblib")
+    loader.load("risk", "current_risk_production.joblib")
     # loader.load("trend", "trend_model.joblib")
 
 
@@ -30,7 +29,7 @@ def get_risk_artifact(model: str = "risk") -> object:
 
     # Map logical model name to artifact file
     artifact_map = {
-        "risk": "risk_production.joblib",
+        "risk": "current_risk_production.joblib",
     }
 
     artifact_file = artifact_map.get(model)
