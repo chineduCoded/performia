@@ -120,6 +120,9 @@ def train_and_save_risk_models(csv_path: Path, version: str | None = None) -> No
         )
 
         best_model = selector.select(model_metrics)
+        if best_model is None:
+            raise RuntimeError(f"No suitable model found for task '{task.name}'")
+
         production_path = ARTIFACTS_DIR / f"{task.name}_production.joblib"
 
         shutil.copy(artifact_paths[best_model], production_path)
@@ -129,6 +132,12 @@ def train_and_save_risk_models(csv_path: Path, version: str | None = None) -> No
 
 
 # =========================
+# Entry Point
+# =========================
+if __name__ == "__main__":
+    train_and_save_risk_models(
+        csv_path=Path(DATA_DIR / "nigerian_university_students.csv")
+    )
 # Entry Point
 # =========================
 if __name__ == "__main__":

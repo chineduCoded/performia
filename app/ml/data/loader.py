@@ -26,8 +26,8 @@ class StudentDataLoader:
         return df_latest
     
     def load_next_score(self) -> pd.DataFrame:
-        df = self._read()
         """Predict next final_score using previous semesters."""
+        df = self._read()
         df = df.sort_values(["student_id", "semester"])
 
         df["prev_final_score"] = df.groupby("student_id")["final_score"].shift(1)
@@ -49,6 +49,8 @@ class StudentDataLoader:
         df["score_delta"] = df["final_score"] - df["prev_final_score"]
 
         def label_trend(delta):
+            if pd.isna(delta):
+                return None
             if delta > threshold:
                 return PerformanceTrend.IMPROVING.value
             elif delta < -threshold:
@@ -57,9 +59,10 @@ class StudentDataLoader:
 
         df["performance_trend"] = df["score_delta"].apply(label_trend)
 
+        df = df.dropna(subset=["prev_final_score"])
         self._validate(df)
 
-        return df.dropna(subset=["prev_final_score"])
+        return df
     
     def load_early_warning(self) -> pd.DataFrame:
         df = self._read()

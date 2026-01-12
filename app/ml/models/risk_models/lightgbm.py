@@ -6,10 +6,6 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from ..base import BaseModelSpec
 
 class LightGBMRiskModel(BaseModelSpec):
-    # def __init__(self, num_features, cat_features):
-    #     self.num_features = num_features
-    #     self.cat_features = cat_features
-
     def build_pipeline(self):
         preprocessor = (
             ColumnTransformer(

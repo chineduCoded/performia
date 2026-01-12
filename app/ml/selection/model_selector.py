@@ -7,7 +7,7 @@ class ModelSelector:
         min_precision: float,
         min_recall: float = 0.0,
         primary_metric: str = "f2",
-        allow_best_fallback: bool = True,
+        allow_best_fallback: bool = False,
     ):
         self.min_precision = min_precision
         self.min_recall = min_recall

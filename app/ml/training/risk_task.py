@@ -3,18 +3,10 @@ from app.ml.features.protocols import FeatureEngineer
 from app.ml.data.types import DataLoaderFn
 
 
-@dataclass(frozen=True, slots=True)
-class RiskTask:
-    name: str
-    loader: DataLoaderFn
-    feature_engineer: FeatureEngineer
-    target: str
-    policy: RiskPolicy
+from dataclasses import dataclass
+from app.ml.features.protocols import FeatureEngineer
+from app.ml.data.types import DataLoaderFn
 
-    @property
-    def primary_metric(self) -> str:
-        return f"f{self.policy.beta}"
-    
 
 @dataclass(frozen=True, slots=True)
 class RiskPolicy:
@@ -29,3 +21,16 @@ class RiskPolicy:
             raise ValueError("min_recall must be in [0, 1]")
         if self.beta <= 0:
             raise ValueError("beta must be > 0")
+
+
+@dataclass(frozen=True, slots=True)
+class RiskTask:
+    name: str
+    loader: DataLoaderFn
+    feature_engineer: FeatureEngineer
+    target: str
+    policy: RiskPolicy
+
+    @property
+    def primary_metric(self) -> str:
+        return f"f{self.policy.beta}"

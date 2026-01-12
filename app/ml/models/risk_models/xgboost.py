@@ -6,20 +6,6 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from ..base import BaseModelSpec
 
 class XGBoostRiskModel(BaseModelSpec):
-    # def __init__(self, num_features, cat_features):
-    #     num_features = num_features or []
-    #     cat_features = cat_features or []
-
-        # if not num_features and not cat_features:
-        #     raise ValueError("At least one of num_features or cat_features must be non-empty")
-        
-        # overlap = set(num_features) & set(cat_features)
-        # if overlap:
-        #     raise ValueError(f"Features cannot be both numerical and categorical: {overlap}")
-        
-        # self.num_features = num_features
-        # self.cat_features = cat_features
-
     def build_pipeline(self):
         preprocessor = (
             ColumnTransformer(
